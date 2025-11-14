@@ -17,8 +17,12 @@ public class Render {
     private int _vaoId;
     private int _vboId;
 
+    private Camera _cam;
+
     public void init() {
         Shader.getInstance().init();
+        this._cam = new Camera();
+        this._cam.setPos(0, 0);
 
         this._vaoId = glGenVertexArrays();
         this._vboId = glGenBuffers();
@@ -33,6 +37,7 @@ public class Render {
         glBufferData(GL_ARRAY_BUFFER, fb, GL_STATIC_DRAW);
         glVertexAttribPointer(0, POS_SIZE, GL_FLOAT, false, PC_SIZE * Float.BYTES, 0);
         glVertexAttribPointer(1, COLOR_SIZE, GL_FLOAT, false, PC_SIZE * Float.BYTES, (POS_SIZE * Float.BYTES));
+        Shader.getInstance().uploadUniformMatrix4f("mvp", this._cam.getCombined());
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
@@ -47,15 +52,19 @@ public class Render {
     }
 
     private float[] verticeList() {
+        // TODO
+        float posx = 25f;
+        float posy = 65f;
+        float size = 300f;
         return new float[] {
                 // POS                      COLORS
-                -0.5f, -0.5f,               1.0f, 0.0f, 0.0f, 1.0f, // Bottom left
-                -0.5f, 0.5f,                0.0f, 1.0f, 0.0f, 1.0f, // Top left
-                0.5f, -0.5f,                0.0f, 0.0f, 1.0f, 1.0f, // Bottom right
+                posx, posy,                 1.0f, 0.0f, 0.0f, 1.0f, // Top left
+                posx, posy + size,          0.0f, 1.0f, 0.0f, 1.0f, // Bottom left
+                posx + size, posy,          0.0f, 0.0f, 1.0f, 1.0f, // Top right
 
-                0.5f, -0.5f,                0.0f, 0.0f, 1.0f, 1.0f, // Bottom right
-                0.5f, 0.5f,                 0.0f, 1.0f, 0.0f, 1.0f, // Top right
-                -0.5f, 0.5f,               0.0f, 1.0f, 0.0f, 1.0f // Top left
+                posx + size, posy,          0.0f, 0.0f, 1.0f, 1.0f, // Top right
+                posx + size, posy + size,   1.0f, 1.0f, 0.0f, 1.0f, // Bottom right
+                posx, posy + size,          0.0f, 1.0f, 0.0f, 1.0f // Bottom left
         };
     }
 }

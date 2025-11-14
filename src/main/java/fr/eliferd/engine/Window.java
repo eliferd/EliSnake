@@ -2,6 +2,7 @@ package fr.eliferd.engine;
 
 import fr.eliferd.engine.input.Keyboard;
 import fr.eliferd.engine.renderer.Render;
+import org.joml.Vector2i;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -60,6 +61,15 @@ public class Window {
         this.printVersionLog();
         this.setViewportSize();
         this.runGameLoop();
+    }
+
+    /**
+     * Gets the viewport width & height
+     */
+    public Vector2i getViewPortSize() {
+        int[] viewportData = {0, 0, 0, 0};
+        glGetIntegerv(GL_VIEWPORT, viewportData);
+        return new Vector2i(viewportData[2], viewportData[3]);
     }
 
     /**

@@ -1,8 +1,9 @@
 package fr.eliferd.engine.renderer;
 
-import org.joml.Vector2f;
-import org.joml.Vector4f;
+import org.joml.Matrix4f;
+import org.lwjgl.BufferUtils;
 
+import java.nio.FloatBuffer;
 import java.util.Map;
 
 import static java.util.Map.entry;
@@ -38,6 +39,13 @@ public class Shader {
 
     public void detach() {
         glUseProgram(0);
+    }
+
+    public void uploadUniformMatrix4f(String name, Matrix4f value) {
+        int uniformLocation = glGetUniformLocation(this._shaderProgramId, name);
+        FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+        value.get(fb);
+        glUniformMatrix4fv(uniformLocation, false, fb);
     }
 
     private void compileShaders() {
@@ -84,10 +92,11 @@ public class Shader {
         return "#version 330 core\n" +
                 "layout(location=0) in vec2 aPos;\n" +
                 "layout(location=1) in vec4 aColor;\n" +
+                "uniform mat4 mvp;" +
                 "out vec4 fColor;\n" +
                 "void main() {\n" +
                 "fColor = aColor;\n" +
-                "gl_Position = vec4(aPos, 0.0f, 1.0f);\n" +
+                "gl_Position = mvp * vec4(aPos, 0.0f, 1.0f);\n" +
                 "}";
     }
 

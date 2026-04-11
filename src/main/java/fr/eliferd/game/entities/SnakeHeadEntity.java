@@ -2,6 +2,7 @@ package fr.eliferd.game.entities;
 
 import fr.eliferd.engine.Window;
 import fr.eliferd.engine.input.Keyboard;
+import fr.eliferd.game.Game;
 import fr.eliferd.game.World;
 import fr.eliferd.game.enums.SnakeDirectionEnum;
 import org.joml.Vector2f;
@@ -73,6 +74,8 @@ public class SnakeHeadEntity extends AbstractEntity {
             if(food.isPresent()) {
                 this.grow();
                 World.getInstance().removeEntity(food.get());
+                Game.getInstance().addScore(20);
+                System.out.println("Current score: " + Game.getInstance().getScore());
             }
         } catch (NullPointerException e) {
             System.err.println("Food not found.");
@@ -105,7 +108,6 @@ public class SnakeHeadEntity extends AbstractEntity {
                 entityPosition.set(entityPosition.x, 0);
             }
 
-
             this._moveCooldown = this._moveCooldownMax;
         }
     }
@@ -119,7 +121,6 @@ public class SnakeHeadEntity extends AbstractEntity {
             parent = this._segmentList.getLast();
         }
 
-        System.out.println(parent);
         SnakeSegmentEntity segment = new SnakeSegmentEntity(new Vector2f(parent.getEntityPosition()), parent);
         World.getInstance().addEntity(segment);
         this._segmentList.add(segment);

@@ -8,13 +8,11 @@ import org.joml.Vector3f;
 public class Camera {
     private Vector3f _cameraPosition;
     private Vector3f _cameraTarget;
-    private Vector3f _cameraDirection;
     private Vector3f _up;
 
     private final Matrix4f _projectionMat = new Matrix4f();
     private final Matrix4f _viewMat = new Matrix4f();
     private final Matrix4f _modelMat = new Matrix4f();
-
 
     public Camera() {
         this._cameraPosition = new Vector3f(0f, 0f, 1f);

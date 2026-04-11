@@ -1,7 +1,7 @@
 package fr.eliferd.engine;
 
-import fr.eliferd.engine.input.Keyboard;
-import fr.eliferd.engine.renderer.Render;
+import fr.eliferd.game.scenes.AbstractScene;
+import fr.eliferd.game.scenes.GameScene;
 import org.joml.Vector2i;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
@@ -22,7 +22,7 @@ public class Window {
     private static final int HEIGHT = 600;
     private static final String TITLE = "EliSnake";
     private long _currentGlfwWindow = NULL;
-    private final Render _renderer = new Render();
+    private AbstractScene _currentScene = null;
     private final Map<Integer,Integer> windowHintsMap = Map.ofEntries(
             entry(GLFW_RESIZABLE, GLFW_FALSE),
             entry(GLFW_CONTEXT_VERSION_MAJOR, 4),
@@ -60,6 +60,7 @@ public class Window {
 
         this.printVersionLog();
         this.setViewportSize();
+        this.setScene(new GameScene());
         this.runGameLoop();
     }
 
@@ -70,6 +71,11 @@ public class Window {
         int[] viewportData = {0, 0, 0, 0};
         glGetIntegerv(GL_VIEWPORT, viewportData);
         return new Vector2i(viewportData[2], viewportData[3]);
+    }
+
+    public void setScene(AbstractScene scene) {
+        this._currentScene = scene;
+        this._currentScene.init();
     }
 
     /**
@@ -95,7 +101,6 @@ public class Window {
      * Runs the game loop
      */
     private void runGameLoop() {
-        this._renderer.init();
         float lastTime = (float)glfwGetTime();
 
         while(!glfwWindowShouldClose(this._currentGlfwWindow)) {
@@ -106,7 +111,7 @@ public class Window {
             float deltaTime = currentTime - lastTime;
 
             if (deltaTime >= 0) {
-                this._renderer.render(deltaTime);
+                this._currentScene.update(deltaTime);
             }
 
             lastTime = currentTime;

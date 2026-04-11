@@ -1,5 +1,9 @@
 package fr.eliferd.engine.renderer;
 
+import fr.eliferd.game.World;
+import fr.eliferd.game.entities.AbstractEntity;
+import org.joml.Vector2f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -29,10 +33,32 @@ public class Render {
     }
 
     public void render(float dt) {
-        FloatBuffer fb = BufferUtils.createFloatBuffer(this.verticeList().length);
-        fb.put(this.verticeList()).flip();
         Shader.getInstance().useProgram();
+
         glBindVertexArray(this._vaoId);
+
+        World.getInstance().getLoadedEntityList().forEach(this::drawEntity);
+
+        glBindVertexArray(0);
+    }
+
+    private float[] buildVerticesFromCoords(Vector2f position, Vector2f offset, float size, Vector4f colors) {
+        return new float[] {
+                // POS (+ offset if any) + SIZE                               COLORS
+                position.x + offset.x, position.y + offset.y,                 colors.x, colors.y, colors.z, colors.w, // Top left
+                position.x + offset.x, position.y + offset.y + size,          colors.x, colors.y, colors.z, colors.w, // Bottom left
+                position.x + offset.x + size, position.y + offset.y,          colors.x, colors.y, colors.z, colors.w, // Top right
+
+                position.x + offset.x + size, position.y + offset.y,          colors.x, colors.y, colors.z, colors.w, // Top right
+                position.x + offset.x + size, position.y + offset.y + size,   colors.x, colors.y, colors.z, colors.w, // Bottom right
+                position.x + offset.x, position.y + offset.y + size,          colors.x, colors.y, colors.z, colors.w // Bottom left
+        };
+    }
+
+    private void drawEntity(AbstractEntity entity) {
+        float[] verticesToDraw = this.buildVerticesFromCoords(entity.getEntityPosition(), entity.getOffset(), entity.getEntitySize(), entity.getEntityColor());
+        FloatBuffer fb = BufferUtils.createFloatBuffer(verticesToDraw.length);
+        fb.put(verticesToDraw).flip();
         glBindBuffer(GL_ARRAY_BUFFER, _vboId);
         glBufferData(GL_ARRAY_BUFFER, fb, GL_STATIC_DRAW);
         glVertexAttribPointer(0, POS_SIZE, GL_FLOAT, false, PC_SIZE * Float.BYTES, 0);
@@ -40,31 +66,9 @@ public class Render {
         Shader.getInstance().uploadUniformMatrix4f("mvp", this._cam.getCombined());
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
-
         glBindBuffer(GL_VERTEX_ARRAY, 0);
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
-
-        glBindVertexArray(0);
-    }
-
-    private float[] verticeList() {
-        // TODO
-        float posx = 25f;
-        float posy = 65f;
-        float size = 300f;
-        return new float[] {
-                // POS                      COLORS
-                posx, posy,                 1.0f, 0.0f, 0.0f, 1.0f, // Top left
-                posx, posy + size,          0.0f, 1.0f, 0.0f, 1.0f, // Bottom left
-                posx + size, posy,          0.0f, 0.0f, 1.0f, 1.0f, // Top right
-
-                posx + size, posy,          0.0f, 0.0f, 1.0f, 1.0f, // Top right
-                posx + size, posy + size,   1.0f, 1.0f, 0.0f, 1.0f, // Bottom right
-                posx, posy + size,          0.0f, 1.0f, 0.0f, 1.0f // Bottom left
-        };
     }
 }

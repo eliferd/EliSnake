@@ -15,6 +15,7 @@ public class Shader {
     private int _vertexShaderId = -1;
     private int _fragmentShaderId = -1;
     private int _shaderProgramId = -1;
+    private boolean _isProgramInUse = false;
 
     public static Shader getInstance() {
         if (_INSTANCE == null) {
@@ -34,10 +35,14 @@ public class Shader {
     }
 
     public void useProgram() {
-        glUseProgram(this._shaderProgramId);
+        if (!this._isProgramInUse) {
+            glUseProgram(this._shaderProgramId);
+            this._isProgramInUse = true;
+        }
     }
 
     public void detach() {
+        this._isProgramInUse = false;
         glUseProgram(0);
     }
 

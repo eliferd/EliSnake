@@ -6,9 +6,12 @@ import fr.eliferd.game.entities.FoodEntity;
 import fr.eliferd.game.entities.SnakeHeadEntity;
 import org.joml.Vector2f;
 
+import java.util.Random;
+
 
 public class GameScene extends AbstractScene {
     private final Render _render = new Render();
+    private Random _rng = new Random();
 
     @Override
     public void init() {
@@ -31,8 +34,8 @@ public class GameScene extends AbstractScene {
         World.getInstance().addEntity(headSnakeEntity);
 
         // TODO : replace this by a more "natural" way to spawn food. Only for tests at the moment.
-        for(int i = 0; i < 10; i++) {
-            FoodEntity food = new FoodEntity(new Vector2f(40f * (i+1), 20f * (i+1)));
+        for(int i = 0; i < 3; i++) {
+            FoodEntity food = new FoodEntity(new Vector2f(60f * ((i+1) * this._rng.nextInt(3)), 80f * ((i+1) * this._rng.nextInt(3))));
             World.getInstance().addEntity(food);
         }
     }

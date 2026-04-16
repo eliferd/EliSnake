@@ -2,10 +2,12 @@ package fr.eliferd.game.scenes;
 
 import fr.eliferd.engine.renderer.Render;
 import fr.eliferd.game.World;
+import fr.eliferd.game.entities.AbstractEntity;
 import fr.eliferd.game.entities.FoodEntity;
 import fr.eliferd.game.entities.SnakeHeadEntity;
 import org.joml.Vector2f;
 
+import java.util.List;
 import java.util.Random;
 
 
@@ -15,7 +17,7 @@ public class GameScene extends AbstractScene {
 
     @Override
     public void init() {
-        // Init rendering
+        // Init rendering engine
         this._render.init();
 
         // Init entities
@@ -30,13 +32,15 @@ public class GameScene extends AbstractScene {
     }
 
     private void initEntities() {
-        SnakeHeadEntity headSnakeEntity = new SnakeHeadEntity(new Vector2f(0f, 0f));
-        World.getInstance().addEntity(headSnakeEntity);
+        final List<AbstractEntity> entities = List.of(
+                new SnakeHeadEntity(new Vector2f(60f, 60f)),
+                new FoodEntity(new Vector2f(240f, 180f))
+        );
+        entities.forEach(World.getInstance()::addEntity);
+    }
 
-        // TODO : replace this by a more "natural" way to spawn food. Only for tests at the moment.
-        for(int i = 0; i < 3; i++) {
-            FoodEntity food = new FoodEntity(new Vector2f(60f * ((i+1) * this._rng.nextInt(3)), 80f * ((i+1) * this._rng.nextInt(3))));
-            World.getInstance().addEntity(food);
-        }
+    @Override
+    public void onDestroy() {
+        World.getInstance().getLoadedEntityList().forEach(World.getInstance()::removeEntity);
     }
 }

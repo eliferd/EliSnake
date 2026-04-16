@@ -12,6 +12,11 @@ public class SnakeSegmentEntity extends SnakeHeadEntity {
         this._parent = parent;
     }
 
+    public void updateCooldownCoords(int newCooldownMax, int cooldownProgress) {
+        this._moveCooldownMax = newCooldownMax;
+        this._moveCooldown = cooldownProgress;
+    }
+
     @Override
     public void update(float dt) {
         if (this._moveCooldown > 0) {

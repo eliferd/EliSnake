@@ -74,6 +74,9 @@ public class Window {
     }
 
     public void setScene(AbstractScene scene) {
+        if (this._currentScene != null) {
+            this._currentScene.onDestroy();
+        }
         this._currentScene = scene;
         this._currentScene.init();
     }
@@ -120,6 +123,10 @@ public class Window {
             glfwPollEvents();
         }
         glfwTerminate();
+    }
+
+    public void closeWindow() {
+        glfwSetWindowShouldClose(this._currentGlfwWindow, true);
     }
 
     public long getGlfwWindow() {

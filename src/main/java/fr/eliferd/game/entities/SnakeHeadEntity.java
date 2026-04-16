@@ -19,7 +19,7 @@ public class SnakeHeadEntity extends AbstractEntity {
     private final float _velocity = 20f;
     private final List<SnakeSegmentEntity> _segmentList = new ArrayList<>();
     private final SnakeDirectionController _controller = new SnakeDirectionController(RIGHT);
-    protected int _moveCooldownMax = 450;
+    protected int _moveCooldownMax = 400;
     protected int _moveCooldown = this._moveCooldownMax;
 
     public SnakeHeadEntity(Vector2f position) {
@@ -85,9 +85,9 @@ public class SnakeHeadEntity extends AbstractEntity {
 
         // If the player hit any wall or itself : game over
         final boolean isOutOfBounds = entityPosition.x < 0 || entityPosition.x > viewportSize.x || entityPosition.y < 0 || entityPosition.y > viewportSize.y;
-        final boolean hasHitSegment = false;
+        final boolean hasHitSegment = this._segmentList.stream().anyMatch(seg -> seg.getEntityPosition().equals(entityPosition));
         if (isOutOfBounds || hasHitSegment) {
-            // TODO : handle game over
+            Game.getInstance().setGameOver();
         }
     }
 
@@ -106,5 +106,14 @@ public class SnakeHeadEntity extends AbstractEntity {
         SnakeSegmentEntity segment = new SnakeSegmentEntity(segmentPosition, parent);
         World.getInstance().addEntity(segment);
         this._segmentList.add(segment);
+
+        this.increaseSpeed();
+    }
+
+    private void increaseSpeed() {
+        this._moveCooldownMax -= 50;
+        this._moveCooldown = this._moveCooldownMax;
+        // applying this new cooldown parameters to all the segments
+        this._segmentList.forEach(s -> s.updateCooldownCoords(this._moveCooldownMax, this._moveCooldown));
     }
 }

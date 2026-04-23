@@ -48,7 +48,7 @@ public class SnakeDirectionController {
         }
 
         // Compute the next direction
-        // We first checks if the next direction is not a forbidden one. If it is, we keep going to the old direction.
+        // We first checks if the next direction is not a forbidden one. If it is, we keep going to the previously set direction.
         final boolean isDirectionForbidden = selectedDirection.equals(this._forbiddenDirections.get(this._currentDirection));
         final SnakeDirectionEnum nextDirection = isDirectionForbidden ? this._currentDirection : selectedDirection;
 

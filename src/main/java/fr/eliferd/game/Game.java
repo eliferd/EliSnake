@@ -20,17 +20,13 @@ public class Game {
 
     public void setGameOver() {
         this._isGameOver = true;
-        int test = JOptionPane.showConfirmDialog(null, "Game Over!\nHere your score: " + this._score + "\nWould you like to play again ?", "Game over", JOptionPane.YES_NO_OPTION);
-        if (test == JOptionPane.YES_OPTION) {
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Game Over!\nYour score: " + this._score + "\nWould you like to play again ?", "Game over", JOptionPane.YES_NO_OPTION);
+        if (dialogResult == JOptionPane.YES_OPTION) {
             this.reset();
             Window.getInstance().setScene(new GameScene());
         } else {
             Window.getInstance().closeWindow();
         }
-    }
-
-    public boolean isGameOver() {
-        return this._isGameOver;
     }
 
     public void reset() {

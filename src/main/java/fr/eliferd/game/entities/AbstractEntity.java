@@ -25,4 +25,7 @@ public abstract class AbstractEntity {
     public Vector2f getOffset() {
         return this._offset;
     }
+    public int getZIndex() {
+        return 0;
+    }
 }

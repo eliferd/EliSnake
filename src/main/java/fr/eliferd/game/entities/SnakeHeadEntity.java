@@ -11,6 +11,7 @@ import org.joml.Vector4f;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import static fr.eliferd.game.enums.SnakeDirectionEnum.RIGHT;
 
@@ -19,6 +20,7 @@ public class SnakeHeadEntity extends AbstractEntity {
     private final float _velocity = 20f;
     private final List<SnakeSegmentEntity> _segmentList = new ArrayList<>();
     private final SnakeDirectionController _controller = new SnakeDirectionController(RIGHT);
+    private final Random _rng = new Random();
     protected int _moveCooldownMax = 400;
     protected int _moveCooldown = this._moveCooldownMax;
 
@@ -53,7 +55,7 @@ public class SnakeHeadEntity extends AbstractEntity {
                 this.grow();
                 World.getInstance().removeEntity(food.get());
                 Game.getInstance().addScore(20);
-                System.out.println("Current score: " + Game.getInstance().getScore());
+                this.plantFoodNearby();
             }
         } catch (NullPointerException e) {
             System.err.println("Food not found.");
@@ -81,14 +83,16 @@ public class SnakeHeadEntity extends AbstractEntity {
     }
 
     private void handleUnallowedMoves(Vector2f entityPosition) {
-        final Vector2i viewportSize = Window.getInstance().getViewPortSize();
-
-        // If the player hit any wall or itself : game over
-        final boolean isOutOfBounds = entityPosition.x < 0 || entityPosition.x > viewportSize.x || entityPosition.y < 0 || entityPosition.y > viewportSize.y;
+        // If the player hit any wall or itself (a.k.a a segment of the snake) = game over
         final boolean hasHitSegment = this._segmentList.stream().anyMatch(seg -> seg.getEntityPosition().equals(entityPosition));
-        if (isOutOfBounds || hasHitSegment) {
+        if (this.isEntityOutOfBounds(entityPosition) || hasHitSegment) {
             Game.getInstance().setGameOver();
         }
+    }
+
+    private boolean isEntityOutOfBounds(Vector2f entityPosition) {
+        final Vector2i viewportSize = Window.getInstance().getViewPortSize();
+        return entityPosition.x < 0 || entityPosition.x > viewportSize.x || entityPosition.y < 0 || entityPosition.y > viewportSize.y;
     }
 
     private void grow() {
@@ -115,5 +119,19 @@ public class SnakeHeadEntity extends AbstractEntity {
         this._moveCooldown = this._moveCooldownMax;
         // applying this new cooldown parameters to all the segments
         this._segmentList.forEach(s -> s.updateCooldownCoords(this._moveCooldownMax, this._moveCooldown));
+    }
+
+    private void plantFoodNearby() {
+        float rndX = this._rng.nextInt(Math.floorDiv(Window.getInstance().getViewPortSize().x, 100)) * 100;
+        float rndY = this._rng.nextInt(Math.floorDiv(Window.getInstance().getViewPortSize().y, 100)) * 100;
+        final Vector2f foodPos = new Vector2f(rndX, rndY);
+
+        FoodEntity food = new FoodEntity(foodPos);
+        World.getInstance().addEntity(food);
+    }
+
+    @Override
+    public int getZIndex() {
+        return 1;
     }
 }

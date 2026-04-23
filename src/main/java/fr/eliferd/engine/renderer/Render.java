@@ -7,6 +7,7 @@ import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
+import java.util.Comparator;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -37,7 +38,9 @@ public class Render {
 
         glBindVertexArray(this._vaoId);
 
-        World.getInstance().getLoadedEntityList().forEach(this::drawEntity);
+        World.getInstance().getLoadedEntityList().stream()
+                .sorted(Comparator.comparingInt(AbstractEntity::getZIndex))
+                .forEach(this::drawEntity);
 
         glBindVertexArray(0);
     }
